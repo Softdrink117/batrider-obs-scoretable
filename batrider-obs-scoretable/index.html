@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Batrider OBS Scoretable v0.1</title>
+    <style>
+    /* DO NOT MODIFY ANIMATION PROPERTIES IN CSS!! */
+    /* They will be overridden by JS controls below. */
+      @font-face {
+          font-family: "Batrider";
+          src: url("./battle-garegga-armed-police-batrider.ttf");
+          format("truetype");
+      }
+
+      html{
+          font-family: "Batrider", monospace;
+          color: white;
+      }
+
+      body{
+        background-color: black;
+        overflow: hidden;
+      }
+
+      .contentWrapper{
+        margin: 0px;
+        position: fixed;
+        width: 400px;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .page{
+        animation-duration: 1s;
+        animation-delay: 0s;
+        animation-name: fadeOut;
+        animation-fill-mode: both;
+      }
+
+      .charData{
+        animation-duration: 1s;
+        animation-delay: 0s;
+        animation-name: slideInRight;
+        animation-fill-mode: both;
+        animation-timing-function: ease-out;
+      }
+
+      .charName{
+        margin-bottom: 0.25rem;
+      }
+
+      .clearType{
+        float: left;
+        margin-right: 1rem;
+      }
+
+      .score{
+        color: green;
+      }
+
+      @keyframes slideInRight {
+        from {
+          margin-left: 100%;
+          width: 300%;
+          opacity: 0.0;
+        }
+
+        to {
+          margin-left: 0%;
+          width: 100%;
+          opacity: 1.0;
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1.0;
+        }
+
+        to {
+          opacity: 0.0;
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+
+    <div class="contentWrapper" id="contentWrapper"></div>
+
+    <script type="text/javascript">
+      let pageChangeTime = 5;     // How long is each page shown (Seconds)
+      let itemsPerPage = 9;       // How many score entries per page
+      let itemEntryTime = 1.0;    // How long do scores animate (Seconds)
+      let perItemDelay = 0.1;     // Delay between item animation (Seconds)
+      let pageFadeOut = 0.5;      // How long does fade out take (Seconds)
+
+      var scores = [
+        {
+          "Name":"D.D",
+          "Cleartype":"ALL",
+          "Score":"1,234,567"
+        },
+        {
+          "Name":"Shorty",
+          "Cleartype":"ALL",
+          "Score":"1,234,567"
+        },
+        {
+          "Name":"Jyuji",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Maria",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Golden",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Strawman",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Birthday",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Tag-T",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Adam",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Silver Sword",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Grasshopper",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Flying Baron",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Wild Snail",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Gain",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Chitta",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Miyamoto",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Bornnam",
+          "Cleartype":"",
+          "Score":" "
+        },
+        {
+          "Name":"Car-Pet",
+          "Cleartype":"",
+          "Score":" "
+        }
+      ]
+
+      let contentWrapper = document.getElementById("contentWrapper");
+
+      let content = "";
+      let pages = 1;
+      let currentPage = 1;
+      let itemsOnCurrentPage = 0;
+
+      content += "<div class=\"page\" id=\"page1\">"
+      for(let i = 0; i < scores.length; i++)
+      {
+        var charData = scores[i];
+        let cleartype = charData.Cleartype;
+        if(!cleartype) cleartype = "---";
+        let score = charData.Score;
+        if(!score) score = "";
+
+        content += "<div class=\"charData\" id=\"charData"+ i + "\">"
+          + "<h2 class=\"charName\">" + charData.Name + "</h2>"
+          + "<span class=\"clearType\">" + cleartype + "</span>"
+          + "<span class=\"score\">" + score + "</span>"
+          + "</div><br>";
+
+        itemsOnCurrentPage++;
+        if(itemsOnCurrentPage >= itemsPerPage && i < scores.length - 1)
+        {
+          itemsOnCurrentPage = 0;
+          currentPage++;
+          pages++;
+          content += "</div>\n<div class=\"page\" id=\"page" + currentPage + "\">";
+        }
+      }
+      content += "</div>";
+
+
+
+      contentWrapper.innerHTML = content;
+
+      // Adjust animation delays
+      for(let i = 0; i < scores.length; i++)
+      {
+        var charDataElement = document.getElementById("charData"+i);
+        charDataElement.style.animationDuration = itemEntryTime + "s";
+        charDataElement.style.animationDelay = ((i % itemsPerPage) * perItemDelay) + "s";
+      }
+
+
+      // Switch between pages
+      let currentDisplayPage = 0; // Start at zero to indicate no display
+
+      function updatePages()
+      {
+        if(pages == 1) return;
+        currentDisplayPage++;
+        if(currentDisplayPage > pages) currentDisplayPage = 1;
+
+        for(let i = 0; i < pages; i++)
+        {
+          var pageElement = document.getElementById("page" + (i+1));
+          pageElement.style.display = "none";
+        }
+        var activePageElement = document.getElementById("page" + currentDisplayPage);
+        activePageElement.style.display = "block";
+        activePageElement.style.animationDelay = (pageChangeTime - 1) + "s";
+        setTimeout(updatePages, pageChangeTime * 1000);
+      }
+
+
+
+      updatePages();
+
+    </script>
+
+  </body>
+</html>
