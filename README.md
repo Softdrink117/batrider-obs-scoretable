@@ -15,6 +15,10 @@ To use, point to this file with a Browser Source in OBS and configure the Browse
 
 The default animation mode is to slide in scores from the right edge, so be sure to specify the width of the Browser Source to match your layout requirements!
 
+
+
+You should not need to make any adjustments to OBS Browser Source CSS settings; the default option will make the background transparent (instead of black), for easier integration into layouts.
+
 Animation timings, items per page, and score contents can be modified in the Javascript section of the `index.html` file. Everything is declared inline (JS/CSS/HTML all in one file), because of the simplicity of the implementation and a desire to avoid CORS errors (during testing, I noticed having an external Javascript file included could cause issues when loading the file locally in Chrome - still investigating fixes for that without requiring the user to host a webserver).
 
 
