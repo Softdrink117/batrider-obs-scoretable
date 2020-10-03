@@ -1,11 +1,41 @@
 <!DOCTYPE html>
+<!--
+Batrider OBS Scoretable
+=========================================================
+
+A super simple implementation of a multi-page score table
+for use as a stream overlay element.
+
+Scores can be entered and split into pages. Each page
+will animate in, persist for a certain amount of time,
+then animate out and advance to the next page.
+
+To use, point to this file with a Browser Source in OBS
+and configure the Browser Source size as desired. You may
+need to adjust the <body> element font-size in the CSS;
+all font size and text spacing is relative to it.
+
+CONTENTS (CTRL+F to jump around):
+=====
+CSS Styling                   -   S.1
+Javascript                    -   S.2
+User Controllable Properties  -   S.2.1
+Score Entry                   -   S.2.2
+Main Functions                -   S.2.3
+ -->
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Batrider OBS Scoretable v0.1</title>
+    <title>Batrider OBS Scoretable v1.0</title>
     <style>
-    /* DO NOT MODIFY ANIMATION PROPERTIES IN CSS!! */
-    /* They will be overridden by JS controls below. */
+      /* S.1 - CSS */
+      /* DO NOT MODIFY ANIMATION TIMINGS IN CSS!! */
+      /* They will be overridden by JS controls below. */
+      /* The main property to manipulate here is body.font-size,
+      all other spacing and text alignment elements are scaled
+      relative to the root body font size. */
+      /* Of course, if you want to manually adjust styles you
+      are welcome to do so! */
       @font-face {
           font-family: "Batrider";
           src: url("./battle-garegga-armed-police-batrider.ttf");
@@ -18,19 +48,25 @@
       }
 
       body{
+        font-size: 22px;
         background-color: black;
         overflow: hidden;
+        margin: 0px;
+        padding: 0px;
       }
 
       .contentWrapper{
         margin: 0px;
+        padding: 0px;
         position: fixed;
-        width: 400px;
+        width: 100%;
         height: 100%;
         overflow: hidden;
       }
 
       .page{
+        margin: 0px;
+
         animation-duration: 1s;
         animation-delay: 0s;
         animation-name: fadeOut;
@@ -38,27 +74,38 @@
       }
 
       .charData{
+        height: 3rem;
+
         animation-duration: 1s;
         animation-delay: 0s;
-        animation-name: slideInRight;
+        animation-name: slideInFromRight;
         animation-fill-mode: both;
         animation-timing-function: ease-out;
       }
 
       .charName{
+        margin-top: 0px;
         margin-bottom: 0.25rem;
+        font-size: 2rem;
       }
 
-      .clearType{
-        float: left;
+      .progress{
+        margin: 0px;
+        padding: 0px;
         margin-right: 1rem;
+        font-size: 1rem;
+        display: inline-block;
       }
 
       .score{
+        margin: 0px;
+        padding: 0px;
         color: green;
+        font-size: 1rem;
+        display: inline-block;
       }
 
-      @keyframes slideInRight {
+      @keyframes slideInFromRight {
         from {
           margin-left: 100%;
           width: 300%;
@@ -89,104 +136,121 @@
     <div class="contentWrapper" id="contentWrapper"></div>
 
     <script type="text/javascript">
-      let pageChangeTime = 5;     // How long is each page shown (Seconds)
+      // S.2 Javascript
+
+      // S.2.1 User Controllable Properties
+      let pageChangeTime = 5;    // How long is each page shown (Seconds)
       let itemsPerPage = 9;       // How many score entries per page
       let itemEntryTime = 1.0;    // How long do scores animate (Seconds)
       let perItemDelay = 0.1;     // Delay between item animation (Seconds)
       let pageFadeOut = 0.5;      // How long does fade out take (Seconds)
 
+      // S.2.2 Score Entry
+      // Scores will be loaded and displayed in the order of the entries
+      // in this array. They will be split into pages based on the
+      // 'itemsPerPage' property above.
+
+      // Data structure explanation:
+      // Name       --    Character name or scorer initials
+      // Progress   --    How far did the credit go? (EG: ALL, St3, ALL 1-Miss, etc.)
+      // Score      --    The score. In string format to support Letter Scores. Note: You must enter the commas yourself because I'm lazy zzz
+
       var scores = [
         {
           "Name":"D.D",
-          "Cleartype":"ALL",
+          "Progress":"ALL",
           "Score":"1,234,567"
         },
         {
           "Name":"Shorty",
-          "Cleartype":"ALL",
+          "Progress":"ALL",
           "Score":"1,234,567"
         },
         {
           "Name":"Jyuji",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Maria",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Golden",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Strawman",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Birthday",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Tag-T",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Adam",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Silver Sword",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Grasshopper",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Flying Baron",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Wild Snail",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Gain",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Chitta",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Miyamoto",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Bornnam",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         },
         {
           "Name":"Car-Pet",
-          "Cleartype":"",
+          "Progress":"",
           "Score":" "
         }
       ]
+
+      // S.2.3 Main Functions
+      // You probably shouldn't mess with these, but you can if you want
+      // I'm not a good JS programmer so there might be a better way to do this, lol.
 
       let contentWrapper = document.getElementById("contentWrapper");
 
@@ -199,16 +263,16 @@
       for(let i = 0; i < scores.length; i++)
       {
         var charData = scores[i];
-        let cleartype = charData.Cleartype;
-        if(!cleartype) cleartype = "---";
+        let progress = charData.Progress;
+        if(!progress) progress = "---";
         let score = charData.Score;
         if(!score) score = "";
 
         content += "<div class=\"charData\" id=\"charData"+ i + "\">"
           + "<h2 class=\"charName\">" + charData.Name + "</h2>"
-          + "<span class=\"clearType\">" + cleartype + "</span>"
+          + "<span class=\"progress\">" + progress + "</span>"
           + "<span class=\"score\">" + score + "</span>"
-          + "</div><br>";
+          + "</div><br><br>";
 
         itemsOnCurrentPage++;
         if(itemsOnCurrentPage >= itemsPerPage && i < scores.length - 1)
@@ -253,8 +317,6 @@
         activePageElement.style.animationDelay = (pageChangeTime - 1) + "s";
         setTimeout(updatePages, pageChangeTime * 1000);
       }
-
-
 
       updatePages();
 
